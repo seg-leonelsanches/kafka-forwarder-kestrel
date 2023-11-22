@@ -1,4 +1,4 @@
-namespace kafka_forwarder_kestrel;
+namespace KafkaForwarderKestrel;
 
 public class WeatherForecast
 {

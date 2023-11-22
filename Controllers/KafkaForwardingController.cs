@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace kafka_forwarder_kestrel.Controllers;
+namespace KafkaForwarderKestrel.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+[Route("")]
+public class KafkaForwardingController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<KafkaForwardingController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public KafkaForwardingController(ILogger<KafkaForwardingController> logger)
     {
         _logger = logger;
     }
