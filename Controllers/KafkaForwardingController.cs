@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KafkaForwarderKestrel.Controllers;
@@ -6,27 +7,29 @@ namespace KafkaForwarderKestrel.Controllers;
 [Route("")]
 public class KafkaForwardingController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
 
     private readonly ILogger<KafkaForwardingController> _logger;
+    private readonly IProducer<string, string> _producer;
 
-    public KafkaForwardingController(ILogger<KafkaForwardingController> logger)
+    public KafkaForwardingController(ILogger<KafkaForwardingController> logger, IProducer<string, string> producer)
     {
         _logger = logger;
+        _producer = producer;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    public static void handler(DeliveryReport<Null, string> report)
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+        Console.WriteLine($"Delivered '{report.Value}' to '{report.TopicPartitionOffset}'");
+    }
+
+    [HttpGet(Name = "Forwarder")]
+    public async Task<string> Get()
+    {
+        var result = await _producer.ProduceAsync("drivetime", new Message<string, string> { Key="123", Value="a log message" });
+        _logger.LogInformation($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
+        return "Ok";
+        // To use the synchronous version, uncomment the following lines:
+        /* _producer.Produce("drivetime", new Message<Null, string> { Value = "hello world" }, handler);
+        return "Ok"; */
     }
 }
