@@ -20,7 +20,7 @@ public class KafkaForwardingController : ControllerBase
     {
         _logger = logger;
         _producer = producer;
-        _topic = configuration.GetValue<string>("Kafka:Topic");
+        _topic = configuration.GetValue<string>("Kafka:Topic") ?? "drivetime";
     }
 
     // This is a synchronous callback.
@@ -29,15 +29,10 @@ public class KafkaForwardingController : ControllerBase
         Console.WriteLine($"Delivered '{report.Value}' to '{report.TopicPartitionOffset}'");
     }
 
-    [HttpGet(Name = "Forwarder")]
+    [HttpGet(Name = "Nothing")]
     public async Task<string> Get()
     {
-        var result = await _producer.ProduceAsync(_topic, new Message<string, string> { Key="Segment", Value="a log message" });
-        _logger.LogInformation($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
         return "Ok";
-        // To use the synchronous version, uncomment the following lines:
-        /* _producer.Produce("drivetime", new Message<Null, string> { Value = "hello world" }, handler);
-        return "Ok"; */
     }
 
     [HttpPost(Name = "Forwarder")]
@@ -46,5 +41,8 @@ public class KafkaForwardingController : ControllerBase
         var result = await _producer.ProduceAsync(_topic, new Message<string, string> { Key="Segment", Value=JsonConvert.SerializeObject(data) });
         _logger.LogInformation($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
         return "Ok";
+        // To use the synchronous version, uncomment the following lines:
+        /* _producer.Produce("drivetime", new Message<Null, string> { Value = "hello world" }, handler);
+        return "Ok"; */
     }
 }
