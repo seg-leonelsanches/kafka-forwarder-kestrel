@@ -1,6 +1,7 @@
 using Confluent.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
+var bootstrapServers = builder.Configuration.GetValue<string>("Kafka:BootstrapServers");
 
 // Add services to the container.
 
@@ -9,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton(p => 
-    new ProducerBuilder<string, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }).Build());
+    new ProducerBuilder<string, string>(new ProducerConfig { BootstrapServers = bootstrapServers }).Build());
 
 var app = builder.Build();
 
